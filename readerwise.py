@@ -7,7 +7,7 @@ by this tool, UNC will be able to improve site reliability, focus on topics of s
 and recognize the authors within the organization delivering the most meaningful content to readers.
 '''
 
-import psycopg2
+import psycopg2, datetime
 
 DBNAME = "news" # Even though our database name is fixed, storing in a variable is good practice for reusability of code.
 
@@ -79,6 +79,23 @@ def author_ranking():
     db.close()
 # End author_ranking function
 
+def high_errors():
+    db = psycopg2.connect(database=DBNAME) # Open connection to news database
+    cur = db.cursor() # Create cursor for querying
+
+    query = "SELECT views_per_day.time::date, ((err_count::numeric / views::numeric)*100) as err_rate FROM views_per_day JOIN errors_per_day ON views_per_day.time::date = errors_per_day.time::date and ((err_count::numeric / views::numeric)*100) > 1;"
+    high_err_days = cur.execute(query)
+
+    print ("\n--Days with >1% request errors--\n")
+
+    for record in cur:
+        high_err_date = record[0]
+        err_rate = record[1]
+        formatted_output = "{} - {:.2f}% errors".format(high_err_date.strftime("%B %d, %Y"), err_rate)
+        print(formatted_output)
+
+#End high_errors function
+
 # --Main script--
 # Executes functions defined above in order to provide insight on each key business
 # inquiry (i.e. each question posed in the Logs Analysis project requirements)
@@ -88,3 +105,6 @@ top_articles()
 
 # Function call to answer question 2
 author_ranking()
+
+# Function call to answer question 3
+high_errors()
