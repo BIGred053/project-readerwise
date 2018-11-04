@@ -32,18 +32,18 @@ Project ReaderWise has the mission of answering three questions, in particular:
 3) On which days did more than 1% of page requests by readers result in errors?
 
 ### Views
-##### logs_top_arts
-This view is a table of the top 3 most visited article paths, used to help answer question 1 above.
+##### logs_article_counts
+This view is a table of the view counts for all 8 articles. This is written to return all results so that this
+view may be used for both Question 1 (Top 3 Articles) and Question 2 (Author Rankings).
 
 Re-create this view with the following code in psql:
 ```
-create view logs_top_arts as
+create view logs_article_counts as
     select path, count(*) as num
         from log
-        where path like '%article%'
+        where path like '%article%' and status = '200 OK'
         group by path
-        order by num desc
-        limit 3;
+        order by num desc;
 ```
 ### Contributions
 Evan McCullough - Python Development
