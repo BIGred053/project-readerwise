@@ -45,6 +45,21 @@ create view logs_article_counts as
         group by path
         order by num desc;
 ```
+
+##### author_views
+This view is a table of author ids (from the articles table) and the total number of article views accrued by each author. This tallies only pages successfully viewed (status = '200 OK') and ignores 'near-match' paths which resulted in 404 errors.
+
+_As a note, this view depends on the logs_article_counts view, so that view must be created first._
+
+Re-create this view with the following code in psql:
+```
+create view author_views as
+    select author, SUM(num) as view_count
+        from articles, logs_article_counts
+        where logs_article_counts.path = '/article/' || articles.slug
+        group by author;
+
+```
 ### Contributions
 Evan McCullough - Python Development
 Udacity - Project premise, Database contents
