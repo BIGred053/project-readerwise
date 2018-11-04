@@ -60,6 +60,29 @@ create view author_views as
         group by author;
 
 ```
+
+##### views_per_day
+This view is a table of each date in the log table, along with a count of all records for that date.
+
+Re-create this view with the following code in psql:
+```
+    create view views_per_day as
+        select time::date, count(*) as views
+        from log
+        group by time::date;
+```
+
+##### errors_per_day
+This view is a table of each date in the log table, along with a count of records for that date where the status code was '404 NOT FOUND'. Analysis of the table showed that the only two status codes listed in the log table were '200 OK' and '404 NOT FOUND', meaning the query constructing this view was safe to search specifically for the '404 NOT FOUND' status.
+
+Re-create this view with the following code in psql:
+```
+    create view errors_per_day as
+        select time::date, count(*) as err_count
+        from log
+        where status = '404 NOT FOUND'
+        group by time::date;
+```
 ### Contributions
 Evan McCullough - Python Development
 Udacity - Project premise, Database contents
