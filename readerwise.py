@@ -12,6 +12,7 @@ import psycopg2, datetime
 DBNAME = "news" # Even though our database name is fixed, storing in a variable is good practice for reusability of code.
 
 # top_articles() Function
+# --------------------
 # Queries the database to retrieve a table with the titles and view counts of
 # the top 3 articles in logs. Outputs the result of this query in a neatly
 # formatted ranking of the top 3 articles with view counts for each.
@@ -45,7 +46,8 @@ def top_articles():
 #End top_articles function
 
 
-# author_ranking function
+# author_ranking() function
+# --------------------
 # Queries the database to retrieve a table with the names of each author and the
 # sum of all page views for each article written by that author. Outputs a list
 # of each author's name, along with that summation of page views, ranked from
@@ -79,20 +81,36 @@ def author_ranking():
     db.close()
 # End author_ranking function
 
+# high_errors() function
+# --------------------
+# This function queries the database, utilizing the views_per_day and errors_per_day
+# Views (defined in README) to find days on which more than 1% of page requests
+# resulted in an error status.
+#
+# The function outputs a list of each date where the
+# error rate exceeded 1%, formatted in plain English, along with the error rate
+# experienced on that date.
 def high_errors():
     db = psycopg2.connect(database=DBNAME) # Open connection to news database
     cur = db.cursor() # Create cursor for querying
 
+    # Query joins the views_per_day View and errors_per_day View to find any date
+    # where the errors that day, divided by total views that day, multiplied by 100
+    # yields a number greater than 1.
+    # "::numeric" ensures that err_count and views are cast as numeric values to
+    # ensure proper division
     query = "SELECT views_per_day.time::date, ((err_count::numeric / views::numeric)*100) as err_rate FROM views_per_day JOIN errors_per_day ON views_per_day.time::date = errors_per_day.time::date and ((err_count::numeric / views::numeric)*100) > 1;"
-    high_err_days = cur.execute(query)
+    high_err_days = cur.execute(query) # Execute query
 
+    # Print out a formatted list of days where the error rate exceeded 1% of page requests
     print ("\n--Days with >1% request errors--\n")
 
+    # Iterate through records returned by the query
     for record in cur:
-        high_err_date = record[0]
-        err_rate = record[1]
+        high_err_date = record[0] # First element in each record is the date where >1% of errors occurred
+        err_rate = record[1] # Second element in each record is the error rate on that day.
         formatted_output = "{} - {:.2f}% errors".format(high_err_date.strftime("%B %d, %Y"), err_rate)
-        print(formatted_output)
+        print(formatted_output) # Output will display as - Month DD, YYYY- X.XX% errors
 
 #End high_errors function
 
