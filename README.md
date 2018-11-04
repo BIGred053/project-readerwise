@@ -8,8 +8,8 @@ Follow the instructions and links below to download/install Project ReaderWise's
 ##### psycopg2
 `pip3 install psycopg2`
 
-
-Database SQL
+###### pycodestyle (for style linting)
+`sudo pip3 install pycodestyle`
 
 ### Usage
 Execute the following command to run ReaderWise and view the analytics insights provided by the tool.
@@ -32,7 +32,7 @@ Project ReaderWise has the mission of answering three questions, in particular:
 3) On which days did more than 1% of page requests by readers result in errors?
 
 ### Views
-##### logs_article_counts
+#### logs_article_counts
 This view is a table of the view counts for all 8 articles. This is written to return all results so that this
 view may be used for both Question 1 (Top 3 Articles) and Question 2 (Author Rankings).
 
@@ -46,10 +46,10 @@ create view logs_article_counts as
         order by num desc;
 ```
 
-##### author_views
+#### author_views
 This view is a table of author ids (from the articles table) and the total number of article views accrued by each author. This tallies only pages successfully viewed (status = '200 OK') and ignores 'near-match' paths which resulted in 404 errors.
 
-_As a note, this view depends on the logs_article_counts view, so that view must be created first._
+_*As a note, this view depends on the logs_article_counts view, so that view must be created first._
 
 Re-create this view with the following code in psql:
 ```
@@ -61,7 +61,7 @@ create view author_views as
 
 ```
 
-##### views_per_day
+#### views_per_day
 This view is a table of each date in the log table, along with a count of all records for that date.
 
 Re-create this view with the following code in psql:
@@ -72,7 +72,7 @@ Re-create this view with the following code in psql:
         group by time::date;
 ```
 
-##### errors_per_day
+#### errors_per_day
 This view is a table of each date in the log table, along with a count of records for that date where the status code was '404 NOT FOUND'. Analysis of the table showed that the only two status codes listed in the log table were '200 OK' and '404 NOT FOUND', meaning the query constructing this view was safe to search specifically for the '404 NOT FOUND' status.
 
 Re-create this view with the following code in psql:
@@ -85,7 +85,8 @@ Re-create this view with the following code in psql:
 ```
 ### Contributions
 Evan McCullough - Python Development
+
 Udacity - Project premise, Database contents
 
 ### License
-Project ReaderWise is shared under the MIT License.
+Project ReaderWise is shared under the MIT License. As a note, other Udacity FSND students should not use this code. Such use would constitute a breach of academic integrity.
