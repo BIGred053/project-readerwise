@@ -1,0 +1,26 @@
+Welcome to Project ReaderWise!
+
+This is an internal analytics program designed to provide valuable business
+insights for our newspaper. With this tool, we aim to provide insight
+regarding the types of content that readers enjoy, the authors who have gained
+the greatest readership, and site reliability.
+
+Question 1: What are the most popular three articles of all time?
+-- Top 3 Most Read Articles --
+
+"Candidate Is Jerk, Alleges Rival" - 338647 views
+"Bears Love Berries, Alleges Bear" - 253801 views
+"Bad Things Gone, Say Good People" - 170098 views
+
+Question 2: Who are the most popular article authors of all time?
+-- Author Rankings --
+
+Ursula La Multa - 507594 article views
+Rudolf von Treppenwitz - 423457 article views
+Anonymous Contributor - 170098 article views
+Markoff Chaney - 84557 article views
+
+Question 3: On which days did more than 1% of requests lead to errors?
+--Days with >1% request errors--
+
+July 17, 2016 - 2.26% errors
