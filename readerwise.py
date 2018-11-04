@@ -160,7 +160,7 @@ def high_errors():
 # Welcome users to Project ReaderWise, introduce the program's purpose
 print("Welcome to Project ReaderWise!\n")
 print("This is an internal analytics program designed to provide valuable"
-      "business insights for our newspaper. With this tool, we aim to provide"
+      " business insights for our newspaper. With this tool, we aim to provide"
       " insight regarding the types of content that readers enjoy, the "
       "authors who have gained the greatest readership, and site reliability."
       "\n"
