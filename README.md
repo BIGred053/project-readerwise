@@ -75,35 +75,6 @@ psql -d news
 
 From here, simply copy and paste any of the code snippets below to re-create my custom views.
 
-#### logs_article_counts
-This view is a table of the view counts for all 8 articles. This is written to return all results so that this
-view may be used for both Question 1 (Top 3 Articles) and Question 2 (Author Rankings).
-
-Re-create this view with the following code in psql:
-```
-create view logs_article_counts as
-    select path, count(*) as num
-        from log
-        where path like '%article%' and status = '200 OK'
-        group by path
-        order by num desc;
-```
-
-#### author_views
-This view is a table of author ids (from the articles table) and the total number of article views accrued by each author. This tallies only pages successfully viewed (status = '200 OK') and ignores 'near-match' paths which resulted in 404 errors.
-
-_*As a note, this view depends on the logs_article_counts view, so that view must be created first._
-
-Re-create this view with the following code in psql:
-```
-create view author_views as
-    select author, SUM(num) as view_count
-        from articles, logs_article_counts
-        where logs_article_counts.path = '/article/' || articles.slug
-        group by author;
-
-```
-
 #### views_per_day
 This view is a table of each date in the log table, along with a count of all records for that date.
 

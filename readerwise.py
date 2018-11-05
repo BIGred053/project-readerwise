@@ -36,11 +36,12 @@ def top_articles():
     #
     # Utilizes PostgreSQL || operator to concatenate the '/aritcle/' portion
     # of the pathname with the article slug.
-    query = ("SELECT title, num from articles, logs_article_counts"
-             " WHERE '/article/' || articles.slug = logs_article_counts.path"
-             " ORDER BY num DESC"
-             " LIMIT 3;"
-             )
+    query = """SELECT title, count(*) as num
+            FROM articles, log
+            WHERE '/article/' || articles.slug = log.path
+            GROUP BY title
+            ORDER BY num DESC
+            LIMIT 3;"""
     top_arts = cur.execute(query)  # Execute our query
 
     # Print out formatted results of top 3 most read articles.
@@ -78,11 +79,13 @@ def author_ranking():
     # Achieves this by matching author's ID in authors table to author's ID in
     # author_views View. Author's ID in author_views View comes from author
     # field in articles table.
-    query = ("SELECT authors.name, view_count"
-             " FROM authors, author_views"
-             " WHERE authors.id = author_views.author"
-             " ORDER BY view_count DESC;"
-             )
+    query = """SELECT authors.name, count(*) as num
+            FROM authors, log, articles
+            WHERE authors.id = articles.author
+            AND '/articles/' || articles.slug = log.path
+            GROUP BY authors.name
+            ORDER BY num DESC;"""
+
     author_ranks = cur.execute(query)  # Execute query
 
     # Print out formatted results of author rankings based on page views for
@@ -123,14 +126,13 @@ def high_errors():
     # Query joins the views_per_day View and errors_per_day View to find any
     # date where the errors that day, divided by total views that day,
     # multiplied by 100 yields a number greater than 1.
-    # "::numeric" ensures that err_count and views are cast as numeric values
-    # to ensure proper division
-    query = ("SELECT views_per_day.time::date,"
-             " ((err_count::numeric / views::numeric)*100) as err_rate"
-             " FROM views_per_day JOIN errors_per_day"
-             " ON views_per_day.time::date = errors_per_day.time::date"
-             " and ((err_count::numeric / views::numeric)*100) > 1;"
-             )
+    # Multiplying by 100.0 ensures result is a float number
+    query = """SELECT TO_CHAR(views_per_day.time::date, 'Mon DD, YYYY'),
+            ((err_count / views)*100.0) as err_rate
+            FROM views_per_day JOIN errors_per_day
+            ON views_per_day.time::date = errors_per_day.time::date
+            AND ((err_count / views)*100.0) > 1;"""
+
     high_err_days = cur.execute(query)  # Execute query
 
     # Print out a formatted list of days where the error rate exceeded 1% of
