@@ -75,6 +75,18 @@ psql -d news
 
 From here, simply copy and paste any of the code snippets below to re-create my custom views.
 
+#### author_views
+This view is a table of author ids (from the articles table) and the total number of article views accrued by each author. This tallies only pages successfully viewed (status = '200 OK') and ignores 'near-match' paths which resulted in 404 errors.
+
+Re-create this view with the following code in psql:
+```
+create view author_views as
+    select author, count(*) as view_count
+        from articles, log
+        where log.path = '/article/' || articles.slug
+        group by author;
+```
+
 #### views_per_day
 This view is a table of each date in the log table, along with a count of all records for that date.
 
