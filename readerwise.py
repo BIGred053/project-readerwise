@@ -79,12 +79,10 @@ def author_ranking():
     # Achieves this by matching author's ID in authors table to author's ID in
     # author_views View. Author's ID in author_views View comes from author
     # field in articles table.
-    query = """SELECT authors.name, count(*) as num
-            FROM authors, log, articles
-            WHERE authors.id = articles.author
-            AND '/articles/' || articles.slug = log.path
-            GROUP BY authors.name
-            ORDER BY num DESC;"""
+    query = """SELECT authors.name, view_count
+             FROM authors, author_views
+             WHERE authors.id = author_views.author
+             ORDER BY view_count DESC;"""
 
     author_ranks = cur.execute(query)  # Execute query
 
@@ -126,12 +124,12 @@ def high_errors():
     # Query joins the views_per_day View and errors_per_day View to find any
     # date where the errors that day, divided by total views that day,
     # multiplied by 100 yields a number greater than 1.
-    # Multiplying by 100.0 ensures result is a float number
+    # Had to cast err_count and views to ::numeric to make query work right
     query = """SELECT TO_CHAR(views_per_day.time::date, 'Mon DD, YYYY'),
-            ((err_count / views)*100.0) as err_rate
+            ((err_count::numeric / views::numeric)*100.0) as err_rate
             FROM views_per_day JOIN errors_per_day
             ON views_per_day.time::date = errors_per_day.time::date
-            AND ((err_count / views)*100.0) > 1;"""
+            AND ((err_count::numeric / views::numeric)*100.0) > 1;"""
 
     high_err_days = cur.execute(query)  # Execute query
 
@@ -146,7 +144,7 @@ def high_errors():
         # Pull error rate on that day.
         err_rate = record[1]
         formatted_output = "{} - {:.2f}% errors".format(
-                            high_err_date.strftime("%B %d, %Y"),
+                            high_err_date,
                             err_rate)
         # Output will display as - Month DD, YYYY- X.XX% errors
         print(formatted_output)
